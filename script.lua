@@ -1,3 +1,4 @@
+loadstring([[
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
@@ -5,40 +6,28 @@ local Workspace = game:GetService("Workspace")
 local UserInputService = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+local placeId = game.PlaceId
+local currentSea = placeId == 7449423635 and "3rd" or placeId == 4442272183 and "2nd" or "1st"
 
--- Detectar Mar actual
-local function getCurrentSea()
-    local placeId = game.PlaceId
-    if placeId == 2753915549 then return "1st Sea" 
-    elseif placeId == 4442272183 then return "2nd Sea"
-    elseif placeId == 7449423635 then return "3rd Sea"
-    else return "Unknown" end
-end
+print("✅ Custom Redz Hub 2026 cargado | Mar detectado: " .. currentSea)
 
-local currentSea = getCurrentSea()
-
--- ScreenGui
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "CustomRedzHub"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.DisplayOrder = 999999
-ScreenGui.IgnoreGuiInset = true
-ScreenGui.Parent = playerGui
+ScreenGui.Parent = player:WaitForChild("PlayerGui")
 
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 400, 0, 580)
-MainFrame.Position = UDim2.new(0.5, -200, 0.5, -290)
-MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
+MainFrame.Size = UDim2.new(0, 460, 0, 650)
+MainFrame.Position = UDim2.new(0.5, -230, 0.5, -325)
+MainFrame.BackgroundColor3 = Color3.fromRGB(18,18,25)
 MainFrame.Active = true
 MainFrame.Parent = ScreenGui
-
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 14)
 
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, -110, 0, 50)
+Title.Size = UDim2.new(1, -140, 0, 50)
 Title.BackgroundTransparency = 1
-Title.Text = "🔥 Custom Redz Hub - " .. currentSea
+Title.Text = "🔥 Custom Redz Hub 2026 - " .. currentSea .. " Sea"
 Title.TextColor3 = Color3.new(1,1,1)
 Title.TextScaled = true
 Title.Font = Enum.Font.GothamBold
@@ -46,38 +35,24 @@ Title.Parent = MainFrame
 
 -- Controles
 local CloseBtn = Instance.new("TextButton", MainFrame)
-CloseBtn.Size = UDim2.new(0,35,0,35)
-CloseBtn.Position = UDim2.new(1,-42,0,8)
-CloseBtn.BackgroundColor3 = Color3.fromRGB(200,40,40)
-CloseBtn.Text = "✕"
-CloseBtn.TextColor3 = Color3.new(1,1,1)
-CloseBtn.TextScaled = true
+CloseBtn.Size = UDim2.new(0,35,0,35); CloseBtn.Position = UDim2.new(1,-45,0,8)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(200,40,40); CloseBtn.Text = "✕"; CloseBtn.TextScaled = true
 
 local MinBtn = Instance.new("TextButton", MainFrame)
-MinBtn.Size = UDim2.new(0,35,0,35)
-MinBtn.Position = UDim2.new(1,-82,0,8)
-MinBtn.BackgroundColor3 = Color3.fromRGB(40,180,40)
-MinBtn.Text = "−"
-MinBtn.TextColor3 = Color3.new(1,1,1)
-MinBtn.TextScaled = true
+MinBtn.Size = UDim2.new(0,35,0,35); MinBtn.Position = UDim2.new(1,-85,0,8)
+MinBtn.BackgroundColor3 = Color3.fromRGB(40,180,40); MinBtn.Text = "−"; MinBtn.TextScaled = true
 
--- Floating Circle
 local FloatCircle = Instance.new("ImageButton")
-FloatCircle.Size = UDim2.new(0, 68, 0, 68)
-FloatCircle.Position = UDim2.new(0.9, -34, 0.5, -34)
-FloatCircle.BackgroundColor3 = Color3.fromRGB(0, 162, 255)
-FloatCircle.Image = "rbxassetid://3926307971"
-FloatCircle.Visible = false
-FloatCircle.Parent = ScreenGui
+FloatCircle.Size = UDim2.new(0,70,0,70); FloatCircle.Position = UDim2.new(0.9,-35,0.5,-35)
+FloatCircle.BackgroundColor3 = Color3.fromRGB(0,162,255); FloatCircle.Image = "rbxassetid://3926307971"
+FloatCircle.Visible = false; FloatCircle.Parent = ScreenGui
 Instance.new("UICorner", FloatCircle).CornerRadius = UDim.new(1,0)
 
 local function makeDraggable(gui)
     local dragging, dragStart, startPos
     gui.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = gui.Position
+            dragging = true; dragStart = input.Position; startPos = gui.Position
         end
     end)
     UserInputService.InputChanged:Connect(function(input)
@@ -86,28 +61,18 @@ local function makeDraggable(gui)
             gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
-    UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
-    end)
+    UserInputService.InputEnded:Connect(function() dragging = false end)
 end
-
-makeDraggable(MainFrame)
-makeDraggable(FloatCircle)
+makeDraggable(MainFrame); makeDraggable(FloatCircle)
 
 CloseBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
-MinBtn.MouseButton1Click:Connect(function()
-    MainFrame.Visible = not MainFrame.Visible
-    FloatCircle.Visible = not FloatCircle.Visible
-end)
-FloatCircle.MouseButton1Click:Connect(function()
-    MainFrame.Visible = true
-    FloatCircle.Visible = false
-end)
+MinBtn.MouseButton1Click:Connect(function() MainFrame.Visible = not MainFrame.Visible; FloatCircle.Visible = not FloatCircle.Visible end)
+FloatCircle.MouseButton1Click:Connect(function() MainFrame.Visible = true; FloatCircle.Visible = false end)
 
 -- Variables
-local isFarming = false
-local farmSpeed = 0.35  -- Default Normal
-local farmConnection = nil
+local toggles = {Farm=false, Quest=false, KillAura=false, Chest=false, Boss=false, ESP=false}
+local farmSpeed = 0.35
+local connections = {}
 
 local function getRoot()
     local char = player.Character or player.CharacterAdded:Wait()
@@ -118,145 +83,140 @@ local function notify(title, text)
     game.StarterGui:SetCore("SendNotification", {Title=title, Text=text, Duration=3})
 end
 
--- Selector de Velocidad de Farm
-local speedLabel = Instance.new("TextLabel")
-speedLabel.Size = UDim2.new(0.9,0,0,30)
-speedLabel.Position = UDim2.new(0.05,0,0,65)
-speedLabel.BackgroundTransparency = 1
-speedLabel.Text = "Velocidad de Farm: Normal"
-speedLabel.TextColor3 = Color3.new(1,1,1)
-speedLabel.TextScaled = true
-speedLabel.Font = Enum.Font.GothamSemibold
-speedLabel.Parent = MainFrame
-
-local speeds = {Safe = 0.55, Normal = 0.35, Fast = 0.22}
-local speedButtons = {}
-local currentSpeedName = "Normal"
-
-for i, name in ipairs({"Safe", "Normal", "Fast"}) do
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.28,0,0,35)
-    btn.Position = UDim2.new(0.05 + (i-1)*0.31, 0, 0, 100)
-    btn.BackgroundColor3 = name == "Normal" and Color3.fromRGB(0,170,100) or Color3.fromRGB(40,40,50)
-    btn.Text = name
-    btn.TextColor3 = Color3.new(1,1,1)
-    btn.TextScaled = true
-    btn.Font = Enum.Font.GothamBold
-    btn.Parent = MainFrame
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0,8)
-    
-    btn.MouseButton1Click:Connect(function()
-        currentSpeedName = name
-        farmSpeed = speeds[name]
-        speedLabel.Text = "Velocidad de Farm: " .. name
-        for _, b in pairs(speedButtons) do b.BackgroundColor3 = Color3.fromRGB(40,40,50) end
-        btn.BackgroundColor3 = Color3.fromRGB(0,170,100)
-        notify("Farm Speed", "Cambiado a " .. name)
-    end)
-    table.insert(speedButtons, btn)
-end
-
--- Auto Farm (adaptado al mar)
-local function startAutoFarm()
-    if farmConnection then farmConnection:Disconnect() end
-    
-    farmConnection = RunService.Heartbeat:Connect(function()
-        if not isFarming then return end
+-- Auto Farm + Auto Quest básico
+local function startFarm()
+    for _, c in pairs(connections) do c:Disconnect() end
+    connections = {}
+    local conn = RunService.Heartbeat:Connect(function()
+        if not toggles.Farm then return end
         local root = getRoot()
         if not root then return end
-        
         local target = nil
-        local minDist = 350
-        
+        local minDist = 420
         for _, enemy in ipairs(Workspace.Enemies:GetChildren()) do
             local hum = enemy:FindFirstChild("Humanoid")
             local hrp = enemy:FindFirstChild("HumanoidRootPart")
             if hum and hum.Health > 0 and hrp then
-                local dist = (root.Position - hrp.Position).Magnitude
-                if dist < minDist then
-                    minDist = dist
-                    target = enemy
+                local d = (root.Position - hrp.Position).Magnitude
+                if d < minDist then minDist = d; target = enemy end
+            end
+        end
+        if target then
+            root.CFrame = root.CFrame:Lerp(target.HumanoidRootPart.CFrame * CFrame.new(0,6,8), farmSpeed)
+            local tool = player.Character:FindFirstChildOfClass("Tool")
+            if tool then local rem = tool:FindFirstChildWhichIsA("RemoteEvent"); if rem then rem:FireServer() end end
+        end
+    end)
+    table.insert(connections, conn)
+end
+
+-- Kill Aura
+local function startKillAura()
+    local ka = RunService.Heartbeat:Connect(function()
+        if not toggles.KillAura then return end
+        local root = getRoot()
+        if not root then return end
+        for _, e in ipairs(Workspace.Enemies:GetChildren()) do
+            local hrp = e:FindFirstChild("HumanoidRootPart")
+            if hrp and (root.Position - hrp.Position).Magnitude < 28 then
+                local tool = player.Character:FindFirstChildOfClass("Tool")
+                if tool then local rem = tool:FindFirstChildWhichIsA("RemoteEvent"); if rem then rem:FireServer() end end
+            end
+        end
+    end)
+    table.insert(connections, ka)
+end
+
+-- Auto Chest
+local function startAutoChest()
+    spawn(function()
+        while toggles.Chest do
+            for _, v in ipairs(Workspace:GetDescendants()) do
+                if v.Name:find("Chest") and v:FindFirstChild("TouchInterest") then
+                    local root = getRoot()
+                    if root and (root.Position - v.Position).Magnitude < 60 then
+                        firetouchinterest(root, v, 0)
+                        task.wait(0.8)
+                    end
                 end
             end
+            task.wait(4)
         end
-        
-        if target and target:FindFirstChild("HumanoidRootPart") then
-            local goal = target.HumanoidRootPart.CFrame * CFrame.new(0, 6, 7)
-            root.CFrame = root.CFrame:Lerp(goal, farmSpeed)
-            
-            -- Ataque
-            local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
-            if tool then
-                local remote = tool:FindFirstChildWhichIsA("RemoteEvent")
-                if remote then remote:FireServer() end
+    end)
+end
+
+-- Auto Boss (básico)
+local function startAutoBoss()
+    spawn(function()
+        while toggles.Boss do
+            for _, boss in ipairs(Workspace.Enemies:GetChildren()) do
+                if boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 and boss.Name:lower():find("boss") or boss.Name:lower():find("elite") then
+                    notify("Auto Boss", "Boss detectado: " .. boss.Name)
+                    break
+                end
+            end
+            task.wait(5)
+        end
+    end)
+end
+
+-- ESP básico
+local function toggleESP()
+    if toggles.ESP then
+        for _, enemy in ipairs(Workspace.Enemies:GetChildren()) do
+            if enemy:FindFirstChild("HumanoidRootPart") then
+                local bill = Instance.new("BillboardGui", enemy.HumanoidRootPart)
+                bill.Adornee = enemy.HumanoidRootPart
+                bill.Size = UDim2.new(0,100,0,50)
+                local txt = Instance.new("TextLabel", bill)
+                txt.Size = UDim2.new(1,0,1,0)
+                txt.BackgroundTransparency = 1
+                txt.Text = enemy.Name
+                txt.TextColor3 = Color3.new(1,0,0)
+                txt.TextScaled = true
             end
         end
-    end)
-end
-
--- Toggle Auto Farm
-local FarmToggle = Instance.new("TextButton")
-FarmToggle.Size = UDim2.new(0.9,0,0,55)
-FarmToggle.Position = UDim2.new(0.05,0,0,150)
-FarmToggle.BackgroundColor3 = Color3.fromRGB(40,40,50)
-FarmToggle.Text = "🔴 Auto Farm Level: OFF"
-FarmToggle.TextColor3 = Color3.new(1,1,1)
-FarmToggle.TextScaled = true
-FarmToggle.Font = Enum.Font.GothamBold
-FarmToggle.Parent = MainFrame
-Instance.new("UICorner", FarmToggle).CornerRadius = UDim.new(0,12)
-
-FarmToggle.MouseButton1Click:Connect(function()
-    isFarming = not isFarming
-    if isFarming then
-        FarmToggle.Text = "🟢 Auto Farm Level: ON (" .. currentSpeedName .. ")"
-        FarmToggle.BackgroundColor3 = Color3.fromRGB(0, 180, 80)
-        startAutoFarm()
-        notify("Auto Farm", "Activado en " .. currentSea)
-    else
-        FarmToggle.Text = "🔴 Auto Farm Level: OFF"
-        FarmToggle.BackgroundColor3 = Color3.fromRGB(40,40,50)
-        if farmConnection then farmConnection:Disconnect() end
     end
-end)
-
--- Teleports según el mar
-local Scroll = Instance.new("ScrollingFrame")
-Scroll.Size = UDim2.new(0.95,0,0,300)
-Scroll.Position = UDim2.new(0.025,0,0,220)
-Scroll.BackgroundTransparency = 1
-Scroll.ScrollBarThickness = 6
-Scroll.Parent = MainFrame
-
-local layout = Instance.new("UIListLayout", Scroll)
-layout.Padding = UDim.new(0,8)
-
-local teleports = {}
-if currentSea == "1st Sea" then
-    teleports = {"Starter Island", "Jungle", "Pirate Village", "Desert", "Middle Town", "Frozen Village"}
-elseif currentSea == "2nd Sea" then
-    teleports = {"Kingdom of Rose", "Cafe", "Green Zone", "Colosseum", "Factory", "Graveyard"}
-else -- 3rd Sea
-    teleports = {"Port Town", "Hydra Island", "Great Tree", "Floating Turtle", "Haunted Castle", "Sea of Treats", "Tiki Outpost", "Castle on the Sea"}
 end
 
-for _, island in ipairs(teleports) do
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, -10, 0, 50)
-    btn.BackgroundColor3 = Color3.fromRGB(35,35,45)
-    btn.Text = "🌊 " .. island
+-- Crear toggles
+local y = 70
+for _, name in ipairs({"Farm", "Quest", "KillAura", "Chest", "Boss", "ESP"}) do
+    local btn = Instance.new("TextButton", MainFrame)
+    btn.Size = UDim2.new(0.9,0,0,48)
+    btn.Position = UDim2.new(0.05,0,0,y)
+    btn.BackgroundColor3 = Color3.fromRGB(40,40,50)
+    btn.Text = "🔴 " .. name
     btn.TextColor3 = Color3.new(1,1,1)
     btn.TextScaled = true
-    btn.Font = Enum.Font.GothamSemibold
-    btn.Parent = Scroll
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0,10)
-    
     btn.MouseButton1Click:Connect(function()
-        notify("Teleport", "Yendo a " .. island)
-        -- Aquí puedes agregar posiciones reales según el mar
-        print("Teleport a: " .. island .. " (" .. currentSea .. ")")
+        toggles[name] = not toggles[name]
+        btn.Text = (toggles[name] and "🟢" or "🔴") .. " " .. name
+        btn.BackgroundColor3 = toggles[name] and Color3.fromRGB(0,180,80) or Color3.fromRGB(40,40,50)
+        
+        if name == "Farm" then startFarm() end
+        if name == "KillAura" then startKillAura() end
+        if name == "Chest" then startAutoChest() end
+        if name == "Boss" then startAutoBoss() end
+        if name == "ESP" then toggleESP() end
     end)
+    y = y + 55
 end
 
-print("✅ Custom Redz Hub cargado correctamente en " .. currentSea)
-notify("Custom Redz Hub", "Detectado: " .. currentSea .. "\nElige tu velocidad de farm")
+-- Speed Selector
+local speedLabel = Instance.new("TextLabel", MainFrame)
+speedLabel.Size = UDim2.new(0.9,0,0,30); speedLabel.Position = UDim2.new(0.05,0,0,y+10)
+speedLabel.BackgroundTransparency = 1; speedLabel.Text = "Farm Speed: Normal"; speedLabel.TextColor3 = Color3.new(1,1,1); speedLabel.TextScaled = true
+
+for i, v in ipairs({{n="Safe",s=0.55}, {n="Normal",s=0.35}, {n="Fast",s=0.22}}) do
+    local btn = Instance.new("TextButton", MainFrame)
+    btn.Size = UDim2.new(0.28,0,0,35); btn.Position = UDim2.new(0.05+(i-1)*0.32,0,0,y+45)
+    btn.Text = v.n; btn.BackgroundColor3 = v.n=="Normal" and Color3.fromRGB(0,170,80) or Color3.fromRGB(40,40,50)
+    btn.TextColor3 = Color3.new(1,1,1); btn.TextScaled = true
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0,8)
+    btn.MouseButton1Click:Connect(function() farmSpeed = v.s; speedLabel.Text = "Farm Speed: "..v.n end)
+end
+
+notify("Custom Redz Hub", "Cargado en " .. currentSea .. " Sea - Usa con cuenta secundaria")
+]])()
