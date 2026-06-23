@@ -1,90 +1,74 @@
 -- // =========================================================================
--- // TITÁN HUB: SEA 1 MODULE (CORE ENGINE V1.0)
+-- // TITÁN HUB PRO v4.0: MÓDULO TOTAL SEA 1 (CÓDIGOS ACTUALIZADOS)
 -- // =========================================================================
 
 local Titan = getgenv().TitanConfig
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
-local TweenService = game:GetService("TweenService")
-local VirtualUser = game:GetService("VirtualUser")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CommF = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("CommF_")
 local LocalPlayer = Players.LocalPlayer
 
--- // 1. BASE DE DATOS MASIVA (AÑADE AQUÍ TUS MILES DE COORDENADAS)
-local DB = {
-    Islands = {
-        ["Starter"] = CFrame.new(945, 16, 1435),
-        ["Jungle"] = CFrame.new(-1585, 7, 145),
-        ["PirateVillage"] = CFrame.new(-1140, 6, 3840),
-        ["Desert"] = CFrame.new(890, 7, 4390),
-        ["SnowIsland"] = CFrame.new(1350, 16, -6380),
-        ["MarineFortress"] = CFrame.new(-5000, 27, 4300),
-        ["Skypiea"] = CFrame.new(-4800, 715, -2600),
-        ["Prison"] = CFrame.new(4800, 17, 720),
-        ["MagmaVillage"] = CFrame.new(-5300, 12, 8500),
-        ["UnderwaterCity"] = CFrame.new(6100, -2, -1400)
-    },
-    Enemies = {
-        "Bandit", "Monkey", "Gorilla", "Pirate", "Brute", "Desert Bandit", "Snow Bandit", "Chief Warden"
-    }
+-- // 1. BASE DE DATOS DE CÓDIGOS (COMPLETA)
+local RedeemCodes = {
+    "EASTEREXP", "KITT_RESET", "SUB2OFFICIALNOOBIE", "AXIORE", "BIGNEWS", 
+    "BLUXXY", "CHANDLER", "ENYU_IS_PRO", "FUDD10", "FUDD10_V2", "JCWK", 
+    "KITTGAMING", "MAGICBUS", "STARCODEHEO", "STRAWHATMAINE", "SUB2CAPTAINMAUI", 
+    "SUB2DAIGROCK", "SUB2FER999", "SUB2GAMERROBOT_EXP1", "SUB2GAMERROBOT_RESET1", 
+    "SUB2NOOBMASTER123", "SUB2UNCLEKIZARU", "TANTAIGAMING", "THEGREATACE",
+    "THIRDSEA", "EXP_5B", "UPDATE11", "PointsReset", "Update10", "Control", 
+    "1MLIKES_RESET", "2BILLION", "3BVISITS", "UPD14", "ShutDownFix2", 
+    "15B_BESTBROTHERS", "GAMERROBOT_YT", "TY_FOR_WATCHING", "DEVSCOOKING", 
+    "NOOB_REFUND", "NEWWORLD", "SEAUNLOCK"
 }
 
--- // 2. MÓDULO DE SEGURIDAD (ANTI-BAN ENGINE)
-local AntiBan = {}
-function AntiBan:Tween(targetCF)
-    local HRP = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-    if not HRP then return end
-    -- Movimiento humanoide: aleatorización para evitar patrones de bot
-    local dist = (HRP.Position - targetCF.Position).Magnitude
-    local speed = math.clamp(dist / 3, 50, 180) -- Limitamos velocidad para no ser baneado
-    local info = TweenInfo.new(dist / speed, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
-    local tween = TweenService:Create(HRP, info, {CFrame = targetCF})
-    tween:Play()
-    return tween
-end
+-- // 2. INTERFAZ PROFESIONAL
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Window = Rayfield:CreateWindow({Name = "TITÁN HUB | PRO DASHBOARD", Theme = "Ocean"})
 
--- // 3. MÓDULO DE FARMING (CORE LÓGICO)
-local Farming = {}
-function Farming:GetTarget()
-    local closest = nil
-    local dist = math.huge
-    for _, v in pairs(Workspace.Enemies:GetChildren()) do
-        if v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 and v:FindFirstChild("HumanoidRootPart") then
-            local d = (LocalPlayer.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
-            if d < dist then dist = d; closest = v end
+-- // SECCIÓN: PERFIL
+local T_Profile = Window:CreateTab("Perfil", "user")
+T_Profile:CreateSection("Usuario: " .. LocalPlayer.Name)
+
+-- // SECCIÓN: FARM
+local T_Farm = Window:CreateTab("Auto Farm", "swords")
+T_Farm:CreateToggle({Name = "Auto Farm Level (1-700)", Callback = function(v) Titan.AutoFarm = v end})
+
+-- // SECCIÓN: MISC (CÓDIGOS Y FPS)
+local T_Misc = Window:CreateTab("Misc", "settings")
+T_Misc:CreateButton({Name = "Canjear TODOS los Códigos", Callback = function()
+    Rayfield:Notify({Title = "Códigos", Content = "Iniciando canje masivo... ¡Espera un momento!"})
+    for _, code in pairs(RedeemCodes) do
+        pcall(function()
+            CommF:InvokeServer("RedeemCode", code)
+        end)
+        task.wait(1.5) -- Delay de seguridad
+    end
+    Rayfield:Notify({Title = "Códigos", Content = "Canje finalizado. Revisa tu consola (F9)."})
+end})
+T_Misc:CreateButton({Name = "Boost FPS (Remover Texturas)", Callback = function()
+    for _, v in pairs(Workspace:GetDescendants()) do if v:IsA("Part") then v.Material = "SmoothPlastic" end end
+end})
+
+-- // MOTOR PRINCIPAL (LOGICA AUTO FARM)
+task.spawn(function()
+    while task.wait(1) do
+        if Titan.AutoFarm then
+            local lvl = LocalPlayer.Data.Level.Value
+            local Quests = {{Level = 1, NPC = "Bandit NPC", Mob = "Bandit"}, {Level = 10, NPC = "Monkey NPC", Mob = "Monkey"}, {Level = 600, NPC = "Cyborg NPC", Mob = "Cyborg"}}
+            
+            for i = #Quests, 1, -1 do
+                if lvl >= Quests[i].Level then
+                    CommF:InvokeServer("StartQuest", Quests[i].NPC)
+                    local enemy = Workspace.Enemies:FindFirstChild(Quests[i].Mob)
+                    if enemy and enemy:FindFirstChild("HumanoidRootPart") then
+                        LocalPlayer.Character.HumanoidRootPart.CFrame = enemy.HumanoidRootPart.CFrame * CFrame.new(0,5,5)
+                    end
+                    break
+                end
+            end
         end
     end
-    return closest
-end
+end)
 
--- // 4. INTERFAZ (RAYFIELD)
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-local Window = Rayfield:CreateWindow({Name = "TITÁN HUB | SEA 1 MASTER", Theme = "Amethyst"})
-
--- [AQUÍ CREAS TODAS TUS TABS Y BOTONES]
-local Tab = Window:CreateTab("Auto Farm", "swords")
-Tab:CreateToggle({
-    Name = "Auto Farm Mobs",
-    Callback = function(v)
-        Titan.AutoFarm = v
-        task.spawn(function()
-            while Titan.AutoFarm do
-                local target = Farming:GetTarget()
-                if target then
-                    AntiBan:Tween(target.HumanoidRootPart.CFrame * CFrame.new(0, 5, 5))
-                    LocalPlayer.Character:FindFirstChildOfClass("Tool"):Activate()
-                end
-                task.wait(0.2)
-            end
-        end)
-    end
-})
-
--- // 5. LÓGICA DE AUTO-QUEST (MASIVA)
-local QuestData = {
-    ["Bandit"] = "Bandit",
-    ["Monkey"] = "Monkey",
-    ["Gorilla"] = "Gorilla"
-}
-
--- Aquí puedes añadir cientos de funciones más siguiendo este patrón de "clases".
-print("✅ Módulo Sea 1 cargado con motor escalable.")
+print("✅ TITÁN HUB PRO: MÓDULO ACTUALIZADO CON CÓDIGOS MASIVOS")
