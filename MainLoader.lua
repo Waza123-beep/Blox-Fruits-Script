@@ -26,7 +26,7 @@ end
 
 -- 3. DETECTOR DE MAR Y EJECUCIÓN
 local PlaceIDs = {
-    [2753915549] = "https://raw.githubusercontent.com/Waza123-beep/Blox-Fruits-Script/refs/heads/main/Sea1_Functions.lua",
+    [113236157544232] = "https://raw.githubusercontent.com/Waza123-beep/Blox-Fruits-Script/refs/heads/main/Sea1_Functions.lua",
     [4442272183] = "https://raw.githubusercontent.com/Waza123-beep/Blox-Fruits-Script/refs/heads/main/Sea2_Functions.lua",
     [5885233282] = "https://raw.githubusercontent.com/Waza123-beep/Blox-Fruits-Script/refs/heads/main/Sea3_Functions.lua"
 }
