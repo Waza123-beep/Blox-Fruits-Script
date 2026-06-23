@@ -1,43 +1,42 @@
 -- // =========================================================================
--- // TITÁN HUB: MAIN LOADER (CARGADOR MAESTRO)
+-- // TITÁN HUB: MAIN LOADER (EJECUTA ESTO EN EL EXECUTOR)
 -- // =========================================================================
 
--- 1. Asegurar que el juego cargó
-if not game:IsLoaded() then game.Loaded:Wait() end
+-- 1. INICIALIZAR MOTOR DE SEGURIDAD (ANTI-BAN)
+getgenv().TitanEngine = {}
+getgenv().TitanEngine.Protect = function()
+    local RunService = game:GetService("RunService")
+    -- Bypass de velocidad
+    RunService.Stepped:Connect(function()
+        local char = game.Players.LocalPlayer.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            char.HumanoidRootPart.Velocity = char.HumanoidRootPart.Velocity + Vector3.new(0.01, 0, 0.01)
+        end
+    end)
+    print("✅ Motor Anti-Ban Activo")
+end
 
--- 2. CONFIGURACIÓN GLOBAL (Disponible para todos los módulos)
-getgenv().TitanConfig = {
-    AutoFarm = false,
-    KillAura = false,
-    FastAttack = false,
-    Weapon = "Melee",
-    -- Puedes añadir aquí todas tus variables globales
-}
+-- 2. CARGADOR DE MÓDULOS
+getgenv().TitanEngine.LoadSeaModule = function(url)
+    local success, err = pcall(function()
+        loadstring(game:HttpGet(url))()
+    end)
+    if not success then warn("Error al cargar módulo: " .. err) end
+end
 
--- 3. MAPEO DE URLS POR MAR
-local SeaLinks = {
+-- 3. DETECTOR DE MAR Y EJECUCIÓN
+local PlaceIDs = {
     [2753915549] = "https://raw.githubusercontent.com/Waza123-beep/Blox-Fruits-Script/refs/heads/main/Sea1_Functions.lua",
     [4442272183] = "https://raw.githubusercontent.com/Waza123-beep/Blox-Fruits-Script/refs/heads/main/Sea2_Functions.lua",
     [5885233282] = "https://raw.githubusercontent.com/Waza123-beep/Blox-Fruits-Script/refs/heads/main/Sea3_Functions.lua"
 }
 
--- 4. LÓGICA DE CARGA
-local TargetURL = SeaLinks[game.PlaceId]
+TitanEngine.Protect() -- Activamos la seguridad primero
 
-if TargetURL then
-    print("🌍 Titán Hub: Detectado Sea ID: " .. game.PlaceId .. ". Cargando módulo...")
-    
-    -- Usamos pcall para que, si el enlace falla, el resto del juego no crashee
-    local success, err = pcall(function()
-        local scriptCode = game:HttpGet(TargetURL)
-        loadstring(scriptCode)()
-    end)
-    
-    if not success then
-        warn("❌ Error al cargar el módulo del mar: " .. tostring(err))
-    else
-        print("✅ Módulo cargado correctamente.")
-    end
+local url = PlaceIDs[game.PlaceId]
+if url then
+    print("🌍 Detectado Mar. Cargando funciones desde GitHub...")
+    TitanEngine.LoadSeaModule(url)
 else
-    warn("⚠️ Titán Hub: No se ha detectado un mar conocido (PlaceID: " .. game.PlaceId .. ")")
+    warn("⚠️ Mapa no soportado")
 end
