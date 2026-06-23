@@ -1,54 +1,40 @@
--- // TITÁN HUB: VERSIÓN "HARD-CODED" (ESTRICTAMENTE GLOBAL)
--- // Forzamos la creación de la tabla en el entorno global del juego
-getgenv().TitanConfig = {
-    AutoFarm = false
-}
+-- // TITÁN HUB: VERSIÓN ESTABLE (NO SPAM)
+-- // Si esto no se mueve, el problema ya no es el script, sino el ID del NPC.
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CommF = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("CommF_")
 local LocalPlayer = Players.LocalPlayer
 
--- Espera de seguridad a que cargue todo
-repeat task.wait() until LocalPlayer:FindFirstChild("Data")
-local CommF = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("CommF_")
+getgenv().TitanConfig = { AutoFarm = false }
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-local Window = Rayfield:CreateWindow({Name = "TITÁN HUB | 100% VERIFIED", Theme = "Ocean"})
-
--- // PESTAÑAS
+local Window = Rayfield:CreateWindow({Name = "TITÁN HUB | ESTABLE", Theme = "Ocean"})
 local T_Farm = Window:CreateTab("Auto Farm", "swords")
 
--- // BOTONES (Acceso directo a getgenv)
 T_Farm:CreateToggle({
-    Name = "Auto Farm Level", 
-    Callback = function(v) 
-        getgenv().TitanConfig.AutoFarm = v 
-        print("AutoFarm cambiado a: " .. tostring(v))
-    end
+    Name = "Auto Farm (Bandits)", 
+    Callback = function(v) getgenv().TitanConfig.AutoFarm = v end
 })
 
--- // MOTOR DE FARM (Independiente y directo)
+-- // MOTOR ESTABLE: Solo se ejecuta cada 3 segundos para no saturar
 task.spawn(function()
-    while task.wait(1) do
-        -- Leemos directamente de getgenv(), no de variables locales
-        if getgenv().TitanConfig and getgenv().TitanConfig.AutoFarm then
-            print("Motor corriendo: Buscando Quest...")
-            
-            pcall(function()
-                -- Lógica básica de movimiento
-                CommF:InvokeServer("StartQuest", "Bandit NPC")
+    while task.wait(3) do
+        if getgenv().TitanConfig.AutoFarm then
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                -- 1. Intentar aceptar misión (solo si no la tienes)
+                pcall(function() CommF:InvokeServer("StartQuest", "Bandit NPC") end)
                 
+                -- 2. Moverse al enemigo
                 local enemy = Workspace.Enemies:FindFirstChild("Bandit")
                 if enemy and enemy:FindFirstChild("HumanoidRootPart") then
-                    LocalPlayer.Character.HumanoidRootPart.CFrame = enemy.HumanoidRootPart.CFrame * CFrame.new(0, 5, 5)
-                    print("Movimiento ejecutado hacia Bandit")
-                else
-                    print("No se encontró enemigo 'Bandit'")
+                    char.HumanoidRootPart.CFrame = enemy.HumanoidRootPart.CFrame * CFrame.new(0, 5, 5)
                 end
-            end)
+            end
         end
     end
 end)
 
-print("✅ TITÁN HUB CARGADO CON ÉXITO")
+print("✅ TITÁN HUB: CARGADO EN MODO ESTABLE")
