@@ -1,41 +1,31 @@
--- // TITÁN HUB: VERSIÓN FINAL Y ESTABLE
+-- // TITÁN HUB: VERSIÓN CON KILL AURA (COMBATE AUTOMÁTICO)
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CommF = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("CommF_")
 local LocalPlayer = Players.LocalPlayer
+local VirtualInputManager = game:GetService("VirtualInputManager")
 
 getgenv().TitanConfig = { AutoFarm = false }
 
 -- // UI SETUP
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-local Window = Rayfield:CreateWindow({Name = "TITÁN HUB | ESTABLE", Theme = "Ocean"})
-
+local Window = Rayfield:CreateWindow({Name = "TITÁN HUB | COMBAT READY", Theme = "Ocean"})
 local T_Farm = Window:CreateTab("Auto Farm", "swords")
-local T_Misc = Window:CreateTab("Misc", "settings")
 
--- // TOGGLE DE FARM (USA LA LÓGICA QUE SÍ FUNCIONÓ)
 T_Farm:CreateToggle({
-    Name = "Auto Farm Automático", 
+    Name = "Auto Farm + Kill Aura", 
     Callback = function(v) getgenv().TitanConfig.AutoFarm = v end
 })
 
--- // BOTÓN DE CÓDIGOS
-T_Misc:CreateButton({Name = "Canjear Códigos", Callback = function()
-    local Codes = {"SUB2OFFICIALNOOBIE", "BIGNEWS", "FUDD10", "FUDD10_V2", "THIRDSEA"}
-    for _, c in pairs(Codes) do pcall(function() CommF:InvokeServer("RedeemCode", c) end) task.wait(0.5) end
-end})
-
--- // MOTOR DE FARM (LÓGICA DINÁMICA QUE VIENE DE LA IMAGEN)
+-- // MOTOR DE COMBATE Y MOVIMIENTO
 task.spawn(function()
-    while task.wait(3) do -- Delay seguro para evitar 'queue exhausted'
+    while task.wait(0.5) do -- Reducimos el tiempo a 0.5 para que el ataque sea rápido
         if getgenv().TitanConfig.AutoFarm then
             local char = LocalPlayer.Character
             if char and char:FindFirstChild("HumanoidRootPart") and Workspace:FindFirstChild("Enemies") then
                 local closestEnemy = nil
                 local dist = 999999
                 
-                -- Busca el enemigo más cercano dinámicamente
+                -- Detectar enemigo cercano
                 for _, enemy in pairs(Workspace.Enemies:GetChildren()) do
                     if enemy:FindFirstChild("HumanoidRootPart") then
                         local d = (enemy.HumanoidRootPart.Position - char.HumanoidRootPart.Position).Magnitude
@@ -46,12 +36,18 @@ task.spawn(function()
                     end
                 end
 
+                -- Acción: Teletransporte + Click
                 if closestEnemy then
-                    char.HumanoidRootPart.CFrame = closestEnemy.HumanoidRootPart.CFrame * CFrame.new(0, 5, 5)
+                    -- Teletransportarse justo encima/enfrente
+                    char.HumanoidRootPart.CFrame = closestEnemy.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
+                    
+                    -- Simular clic (M1)
+                    VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, false)
+                    VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, false)
                 end
             end
         end
     end
 end)
 
-print("✅ TITÁN HUB: MÓDULO INTELIGENTE CARGADO")
+print("✅ TITÁN HUB: MODO COMBATE ACTIVADO")
